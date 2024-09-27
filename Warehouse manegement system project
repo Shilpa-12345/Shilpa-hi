@@ -1,0 +1,124 @@
+class Item:
+    def __init__(self, item_id: str, name: str, quantity: int, restock_level: int):
+        self.item_id = item_id
+        self.name = name
+        self.quantity = quantity
+        self.restock_level = restock_level
+
+    def __str__(self):
+        return (f"Item(ID: {self.item_id}, Name: {self.name}, "
+                f"Quantity: {self.quantity}, Restock Level: {self.restock_level})")
+
+
+class Warehouse:
+    def __init__(self):
+        self.items = {}
+
+    def add_item(self):
+        item_id = input("Enter item ID: ")
+        name = input("Enter item name: ")
+        quantity = int(input("Enter item quantity: "))
+        restock_level = int(input("Enter restock level: "))
+        
+        if item_id in self.items:
+            print(f"Item with ID {item_id} already exists.")
+        else:
+            self.items[item_id] = Item(item_id, name, quantity, restock_level)
+            print(f"Added: {self.items[item_id]}")
+
+    def update_item(self):
+        item_id = input("Enter item ID to update: ")
+        if item_id in self.items:
+            quantity = input("Enter new quantity (leave blank to keep current): ")
+            restock_level = input("Enter new restock level (leave blank to keep current): ")
+            
+            if quantity:
+                self.items[item_id].quantity = int(quantity)
+            if restock_level:
+                self.items[item_id].restock_level = int(restock_level)
+
+            print(f"Updated: {self.items[item_id]}")
+        else:
+            print(f"Item with ID {item_id} not found.")
+
+    def delete_item(self):
+        item_id = input("Enter item ID to delete: ")
+        if item_id in self.items:
+            del self.items[item_id]
+            print(f"Deleted item with ID {item_id}.")
+        else:
+            print(f"Item with ID {item_id} not found.")
+
+    def get_item(self):
+        item_id = input("Enter item ID to retrieve: ")
+        item = self.items.get(item_id)
+        
+        if item:
+            print(item)
+            
+            # Ask for quantity to purchase
+            purchase_quantity = int(input("Enter quantity to purchase (0 to cancel): "))
+            
+            if purchase_quantity > 0:
+                if purchase_quantity <= item.quantity:
+                    item.quantity -= purchase_quantity
+                    print(f"Purchased {purchase_quantity} of {item.name}. New quantity: {item.quantity}")
+                else:
+                    print(f"Insufficient stock. Available quantity: {item.quantity}")
+            else:
+                print("Purchase cancelled.")
+        else:
+            print("Item not found.")
+
+    def check_inventory(self):
+        restock_alerts = [f"Restock alert for: {item.name}. Current quantity: {item.quantity}" 
+                          for item in self.items.values() if item.quantity <= item.restock_level]
+        
+        if restock_alerts:
+            for alert in restock_alerts:
+                print(alert)
+        else:
+            print("All items are above their restock levels.")
+
+    def inventory_summary(self):
+        if not self.items:
+            print("No items in the warehouse.")
+            return
+        
+        print("\nInventory Summary:")
+        for item in self.items.values():
+            print(item)
+
+
+if __name__ == "__main__":
+    warehouse = Warehouse()
+    
+    while True:
+        print("\nWarehouse Management System")
+        print("1. Add Item")
+        print("2. Update Item")
+        print("3. Delete Item")
+        print("4. Get Item")
+        print("5. Check Inventory")
+        print("6. Inventory Summary")
+        print("7. Exit")
+        
+        choice = input("Choose an option (1-7): ")
+        
+        if choice == '1':
+            warehouse.add_item()
+        elif choice == '2':
+            warehouse.update_item()
+        elif choice == '3':
+            warehouse.delete_item()
+        elif choice == '4':
+            warehouse.get_item()
+        elif choice == '5':
+            warehouse.check_inventory()
+        elif choice == '6':
+            warehouse.inventory_summary()
+        elif choice == '7':
+            print("Exiting the system.")
+            break
+        else:
+            print("Invalid choice, please try again.")
